@@ -17,7 +17,15 @@ cc.Class({
     onLoad () { 
         this.node.on('touchstart', function(){
             let countCell = 8;
-            cc.find("Canvas/Board").getComponent("Board").click(new cc.Vec2(this.x/32 + countCell/2, this.y/32 + countCell/2));
+            if(this.getComponent("Checker"))
+                cc.find("Canvas/Board").getComponent("Board").click(this.getComponent("Checker").pos);
+            else if(this.getComponent("Cell"))
+                cc.find("Canvas/Board").getComponent("Board").click(this.getComponent("Cell").pos);
+            
+            // cc.log(this);
+            // cc.find("Canvas/Board").getComponent("Board").click(new cc.Vec2(this.x/32 + countCell/2, this.y/32 + countCell/2));
+            // cc.find("Canvas/Board").getComponent("Board").click(this.getComponent("Checker").pos);
+
         }, this.node);  
     },
 
