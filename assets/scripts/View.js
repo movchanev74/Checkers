@@ -1,13 +1,3 @@
-// Learn cc.Class:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] https://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
-
 cc.Class({
     extends: cc.Component,
 
@@ -15,41 +5,45 @@ cc.Class({
         spriteGreenPoint: {
             default: null,
             type: cc.SpriteFrame
-        },
+        }
     },
-
-    moveChecker(startPos,endPos,checher)
+    init(countCell,widthCell){
+        this.countCell = countCell; 
+        this.widthCell = widthCell;
+    },
+    moveChecker(endPos,checker)
     {
-        let countCell = 8;
-        cc.log(startPos);
-        cc.log(endPos);
-        checher.x = (endPos.x - countCell/2)*32;
-        checher.y = (endPos.y - countCell/2)*32;
+        checker.x = (endPos.x - this.countCell/2)*this.widthCell;
+        checker.y = (endPos.y - this.countCell/2)*this.widthCell;
+        this.hideMove();
+    },
+    cutChecker(endPos,checker,cutedChecker){
+        checker.x = (endPos.x - this.countCell/2)*this.widthCell;
+        checker.y = (endPos.y - this.countCell/2)*this.widthCell;
+        cutedChecker.active = false;
+        this.hideMove();
     },
     showMove(moves){
-        let countCell = 8;
-        for (let i = 0; i < this.moves.length; i++) 
-            this.moves[i].destroy();
+        this.hideMove();
         for (let i = 0; i < moves.length; i++) 
         {
             let newMove = new cc.Node();
             let spriteComponent = newMove.addComponent(cc.Sprite);
             spriteComponent.spriteFrame = this.spriteGreenPoint;
             this.movesParent.addChild(newMove);
-            newMove.position = new cc.Vec2((moves[i].x - countCell/2)*32, (moves[i].y - countCell/2)*32);
+            newMove.position = new cc.Vec2((moves[i].x - this.countCell/2)*this.widthCell, (moves[i].y - this.countCell/2)*this.widthCell);
             this.moves.push(newMove);
         }
-        cc.log("moves: /t" + this.moves);
     },
-    // LIFE-CYCLE CALLBACKS:
-
-    // onLoad () {},
-
+    hideMove()
+    {
+        for (let i = 0; i < this.moves.length; i++) 
+            this.moves[i].destroy();
+        this.moves = [];
+    },
     start () {
         this.moves = [];
         this.movesParent = new cc.Node();
         this.node.addChild(this.movesParent);
-    },
-
-    // update (dt) {},
+    }
 });
