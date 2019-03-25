@@ -75,6 +75,10 @@ cc.Class({
 			default:null,
 			type:cc.Prefab
 		},
+		isRotate: {
+            default: null,
+            type: cc.Node
+        },
 		countCell:8
     },
    	inArray(arr,item){
@@ -106,6 +110,13 @@ cc.Class({
     	this.selectedChecker = null;
     	this.currentCheckerStartMove = false;
     	this.checkEndGame();
+    	if(this.isRotate.getComponent(cc.Toggle).isChecked){
+    		this.node.rotation = 180 * this.currentPlayer;
+    		for (let x = 0; x < this.countCell; x++) 
+				for (let y = 0; y < this.countCell; y++)
+					if(this.checkersArray[x][y] != null)
+						this.checkersArray[x][y].rotation = 180* this.currentPlayer;
+		}	
     },
     checkEndGame(){
     	let whiteWin = true;
@@ -137,9 +148,9 @@ cc.Class({
     				checkMove.call(this,new cc.Vec2(pos.x+x,pos.y+y),new cc.Vec2(x,y));
     	}
     	else{
-    		let direction = 1;
+    		let direction = -1;
     		if(this.selectedChecker.getComponent("Checker").checkersColor ==CurrentPlayerState.White)
-    			direction = -1;
+    			direction = 1;
     		if(pos.x+1 < this.countCell && this.checkersArray[pos.x+1][pos.y+direction] == null)
     			this.possibleMoves.push(new cc.Vec2(pos.x+1,pos.y+direction));
     		if(pos.x-1 >= 0 && this.checkersArray[pos.x-1][pos.y+direction] == null)
@@ -196,19 +207,19 @@ cc.Class({
     	let startPos = this.selectedChecker.getComponent("Checker").pos;
     	this.checkersArray[endPos.x][endPos.y] = this.checkersArray[startPos.x][startPos.y];
     	this.checkersArray[startPos.x][startPos.y] = null;
+    	this.createQueen(endPos);
     	this.node.getComponent("View").moveChecker(endPos,this.checkersArray[endPos.x][endPos.y]);
     	this.selectedChecker.getComponent("Checker").pos = endPos;
-    	this.createQueen(endPos);
     	this.selectedChecker = null;
     	this.nextPlayer();
     	this.possibleMoves = [];
     },
     createQueen(pos){
-    	if(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == CurrentPlayerState.White && pos.y == 0){
+    	if(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == CurrentPlayerState.White && pos.y == this.countCell-1){
     		this.checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = this.spriteWhiteQueen;
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = true;
     	} 
-    	if(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == CurrentPlayerState.Black && pos.y == this.countCell-1){
+    	if(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == CurrentPlayerState.Black && pos.y == 0){
     		this.checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = this.spriteBlackQueen;
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = true;
     	}
@@ -224,8 +235,8 @@ cc.Class({
     	let cutedPos = this.victims[this.inArray(this.requiredMoves,endPos)].getComponent("Checker").pos;
     	this.checkersArray[cutedPos.x][cutedPos.y] = null;
 
-    	this.node.getComponent("View").cutChecker(
-    		endPos,this.checkersArray[endPos.x][endPos.y]);//,this.victims[this.inArray(this.requiredMoves,endPos)]);
+    	this.node.getComponent("View").moveChecker(
+    		endPos,this.checkersArray[endPos.x][endPos.y]);
 
     	this.checkersPool.put(this.victims[this.inArray(this.requiredMoves,endPos)]);
 
@@ -278,7 +289,7 @@ cc.Class({
 			let spriteComponent = newCell.addComponent(cc.Sprite);
 			spriteComponent.spriteFrame = sprite;
 			this.node.addChild(newCell);
-			newCell.position = new cc.Vec2(pos.x*this.widthCell, pos.y*this.widthCell);
+			newCell.position = new cc.Vec2(pos.x*this.widthCell+this.widthCell/2, pos.y*this.widthCell+this.widthCell/2);
     	}
 
     	for (let i = -countCell/2; i < countCell/2; i++) {
@@ -307,19 +318,13 @@ cc.Class({
             } else {
                 this.checkersArray[pos.x][pos.y] = cc.instantiate(this.whiteChecker);
             }
-            this.checkersArray[pos.x][pos.y].position = 
-            	new cc.Vec2((pos.x - this.countCell/2)*this.widthCell, (pos.y - this.countCell/2)*this.widthCell);
+            this.checkersArray[pos.x][pos.y].position = new cc.Vec2(
+            	(pos.x - this.countCell/2)*this.widthCell+this.widthCell/2, 
+            	(pos.y - this.countCell/2)*this.widthCell+this.widthCell/2);
             this.checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = checker;
             this.checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = false;
     		return this.checkersArray[pos.x][pos.y];
-
-    		// this.checkersArray[pos.x][pos.y] = cc.instantiate(checker);
-    		// // this.checkersArray[pos.x][pos.y].rotation = 180;
-    		// this.checkersArray[pos.x][pos.y].position = new cc.Vec2((pos.x - this.countCell/2)*this.widthCell, (pos.y - this.countCell/2)*this.widthCell);
-    		// this.checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
-    		// this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = false;
-    		// this.node.addChild(this.checkersArray[pos.x][pos.y]);
     	}
 
     	let parent = new cc.Node();
@@ -329,14 +334,12 @@ cc.Class({
 			for (let y = 0; y < this.countCell; y++){
 				this.checkersArray[x][y] = null;
     			if(y >= 0 && y < 3 && ((1+x+y)%2 == 0)){
-    				parent.addChild(createChecker.call(this, this.spriteBlackChecker, new cc.Vec2(x, y)));
-    				// parent.addChild(createChecker.call(this, this.blackChecker, new cc.Vec2(x, y)));
-    				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.Black;
+    				parent.addChild(createChecker.call(this, this.spriteWhiteChecker, new cc.Vec2(x, y)));
+    				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.White;
     			}
     			if(y >= this.countCell-3 && y < this.countCell && ((1+x+y)%2 == 0)){
-    				parent.addChild(createChecker.call(this, this.spriteWhiteChecker, new cc.Vec2(x, y)));
-    				// parent.addChild(createChecker.call(this, this.whiteChecker, new cc.Vec2(x, y)));
-    				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.White;
+    				parent.addChild(createChecker.call(this, this.spriteBlackChecker, new cc.Vec2(x, y)));
+    				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.Black;
     			}
     		}
     	return parent;

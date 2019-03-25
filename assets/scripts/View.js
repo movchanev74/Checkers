@@ -22,14 +22,8 @@ cc.Class({
     },
     moveChecker(endPos,checker)
     {
-        checker.x = (endPos.x - this.countCell/2)*this.widthCell;
-        checker.y = (endPos.y - this.countCell/2)*this.widthCell;
-        this.hideMove();
-    },
-    cutChecker(endPos,checker){//,cutedChecker){
-        checker.x = (endPos.x - this.countCell/2)*this.widthCell;
-        checker.y = (endPos.y - this.countCell/2)*this.widthCell;
-        // cutedChecker.active = false;
+        checker.x = (endPos.x - this.countCell/2)*this.widthCell+this.widthCell/2;
+        checker.y = (endPos.y - this.countCell/2)*this.widthCell+this.widthCell/2;
         this.hideMove();
     },
     showMove(moves){
@@ -43,7 +37,9 @@ cc.Class({
                 newGreenPoint = cc.instantiate(this.greenPointPrefab);
             }
             this.movesParent.addChild(newGreenPoint);
-            newGreenPoint.position = new cc.Vec2((moves[i].x - this.countCell/2)*this.widthCell, (moves[i].y - this.countCell/2)*this.widthCell);
+            newGreenPoint.position = new cc.Vec2(
+                (moves[i].x - this.countCell/2)*this.widthCell+this.widthCell/2, 
+                (moves[i].y - this.countCell/2)*this.widthCell+this.widthCell/2);
             this.moves.push(newGreenPoint);
 
             //let newMove = new cc.Node();
