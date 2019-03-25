@@ -13,7 +13,7 @@ cc.Class({
 
     properties: {
     },
-    onLoad () { 
+    onLoad () { //function called on load
         this.node.on('touchstart', function(){
             if(this.getComponent("Checker"))
                 cc.find("Canvas/Board").getComponent("Board").click(this.getComponent("Checker").pos);

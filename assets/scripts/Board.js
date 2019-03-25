@@ -81,13 +81,13 @@ cc.Class({
         },
 		countCell:8
     },
-   	inArray(arr,item){
+   	inArray(arr,item){//check element Vec2 in array
    		for (let i = 0; i < arr.length ;i++) 
    			if(arr[i].x == item.x && arr[i].y == item.y)
    				return i;
    		return -1;
     },
-    onLoad () {
+    onLoad () {//function called on load
 
     	this.checkersArray = new Array(this.countCell);
 		for (var i = 0; i < this.checkersArray.length; i++) {
@@ -102,7 +102,7 @@ cc.Class({
     	this.possibleMoves = [];
     	this.victims = [];
     },
-    nextPlayer(){
+    nextPlayer(){//change curent player on other
     	if(this.currentPlayer == CurrentPlayerState.White)
     		this.currentPlayer = CurrentPlayerState.Black;
     	else
@@ -118,7 +118,7 @@ cc.Class({
 						this.checkersArray[x][y].rotation = 180* this.currentPlayer;
 		}	
     },
-    checkEndGame(){
+    checkEndGame(){//check if the game ended
     	let whiteWin = true;
     	let blackWin = true;
     	for (let x = 0; x < this.countCell; x++) 
@@ -132,7 +132,7 @@ cc.Class({
 		if(whiteWin) this.node.getComponent("View").showEndGame("White Win"); //cc.log("White Win");
 		if(blackWin) this.node.getComponent("View").showEndGame("Black Win"); //cc.log("Black Win");
     },
-    showMove(){
+    showMove(){//show posible move for selected checker
     	this.possibleMoves = [];
        	let pos = this.selectedChecker.getComponent("Checker").pos;
     	if(this.selectedChecker.getComponent("Checker").isQueen){
@@ -158,7 +158,7 @@ cc.Class({
     	}
     	this.node.getComponent("View").showMove(this.possibleMoves);
     },
-    showCutMove(checker){
+    showCutMove(checker){//show required move for checker
     	if(!checker.getComponent("Checker"))
     		return false;
     	this.requiredMoves = [];
@@ -203,7 +203,7 @@ cc.Class({
     		return false;
     	return true;
     },
-    moveChecker(endPos){
+    moveChecker(endPos){//move selectedChecker to endPos
     	let startPos = this.selectedChecker.getComponent("Checker").pos;
     	this.checkersArray[endPos.x][endPos.y] = this.checkersArray[startPos.x][startPos.y];
     	this.checkersArray[startPos.x][startPos.y] = null;
@@ -214,7 +214,7 @@ cc.Class({
     	this.nextPlayer();
     	this.possibleMoves = [];
     },
-    createQueen(pos){
+    createQueen(pos){//check whether the checker is a queen
     	if(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == CurrentPlayerState.White && pos.y == this.countCell-1){
     		this.checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = this.spriteWhiteQueen;
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = true;
@@ -224,8 +224,7 @@ cc.Class({
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = true;
     	}
     },
-    cutChecker(endPos){
-
+    cutChecker(endPos){//cut checker in position endPos
     	let startPos = this.selectedChecker.getComponent("Checker").pos;
     	this.checkersArray[endPos.x][endPos.y] = this.checkersArray[startPos.x][startPos.y];
     	this.checkersArray[startPos.x][startPos.y] = null;
@@ -247,7 +246,7 @@ cc.Class({
     		this.nextPlayer();
     	}
     },
-    needToChop()
+    needToChop()//check if you should to chop on this turn
     {
    		let requiredCut = false;
    		for (let x = 0; x < this.countCell; x++) 
@@ -258,7 +257,7 @@ cc.Class({
    		this.node.getComponent("View").hideMove();
    		return requiredCut;
     },
-    click(pos){
+    click(pos){//click on a cell or checker
    		let requiredCut = this.needToChop();
    		
    		if(this.selectedChecker)
@@ -280,7 +279,7 @@ cc.Class({
     		this.cutChecker(pos);
     	}
     },
-    createBoard(countCell){
+    createBoard(){//create board 
     	function createCell(sprite,pos,newCell){
     		if(newCell == null)
 	    		newCell = new cc.Node();
@@ -292,25 +291,25 @@ cc.Class({
 			newCell.position = new cc.Vec2(pos.x*this.widthCell+this.widthCell/2, pos.y*this.widthCell+this.widthCell/2);
     	}
 
-    	for (let i = -countCell/2; i < countCell/2; i++) {
-			createCell.call(this, this.spriteDown,new cc.Vec2(i, -countCell/2-1));
-    		createCell.call(this, this.spriteUp,new cc.Vec2(i, countCell/2));
-    		createCell.call(this, this.spriteLeft,new cc.Vec2(-countCell/2-1, i));
-			createCell.call(this, this.spriteRight,new cc.Vec2(countCell/2, i));
+    	for (let i = -this.countCell/2; i < this.countCell/2; i++) {
+			createCell.call(this, this.spriteDown,new cc.Vec2(i, -this.countCell/2-1));
+    		createCell.call(this, this.spriteUp,new cc.Vec2(i, this.countCell/2));
+    		createCell.call(this, this.spriteLeft,new cc.Vec2(-this.countCell/2-1, i));
+			createCell.call(this, this.spriteRight,new cc.Vec2(this.countCell/2, i));
 		}
-		createCell.call(this, this.spriteRightUp,new cc.Vec2(countCell/2, countCell/2));
-    	createCell.call(this, this.spriteRightDown,new cc.Vec2(countCell/2, -countCell/2-1));
-    	createCell.call(this, this.spriteLeftUp,new cc.Vec2(-countCell/2-1, countCell/2));
-		createCell.call(this, this.spriteLeftDown,new cc.Vec2(-countCell/2-1, -countCell/2-1));
+		createCell.call(this, this.spriteRightUp,new cc.Vec2(this.countCell/2, this.countCell/2));
+    	createCell.call(this, this.spriteRightDown,new cc.Vec2(this.countCell/2, -this.countCell/2-1));
+    	createCell.call(this, this.spriteLeftUp,new cc.Vec2(-this.countCell/2-1, this.countCell/2));
+		createCell.call(this, this.spriteLeftDown,new cc.Vec2(-this.countCell/2-1, -this.countCell/2-1));
 
-		for (let i = -countCell/2; i < countCell/2; i++) 
-			for (let j = -countCell/2; j < countCell/2; j++)
+		for (let i = -this.countCell/2; i < this.countCell/2; i++) 
+			for (let j = -this.countCell/2; j < this.countCell/2; j++)
 				if((1+i+j)%2 == 0)
 					createCell.call(this, this.spriteWhiteWood,new cc.Vec2(i, j),cc.instantiate(this.cell));
 				else
 					createCell.call(this, this.spriteBlackWood,new cc.Vec2(i, j),cc.instantiate(this.cell));
     },
-    addCheckers(){
+    addCheckers(){// create checkers and add their to array 
     	function createChecker(checker,pos){
     		this.checkersArray[pos.x][pos.y] = null;     
             if (this.checkersPool.size() > 0) {
@@ -350,7 +349,7 @@ cc.Class({
     	this.parentCheckers = this.addCheckers();
     	this.node.getComponent("View").init(this.countCell,this.widthCell);
     },
-    newGame (){
+    newGame (){//creating a new game
     	this.node.getComponent("View").showEndGame("");
     	this.parentCheckers.destroy();
     	this.onLoad();
