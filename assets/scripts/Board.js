@@ -47,11 +47,7 @@ cc.Class({
         	default: null,
         	type: cc.SpriteFrame
     	},
-    	whiteChecker:{
-			default:null,
-			type:cc.Prefab
-		},
-    	blackChecker:{
+    	checkerPrefab:{
 			default:null,
 			type:cc.Prefab
 		},
@@ -315,7 +311,7 @@ cc.Class({
             if (this.checkersPool.size() > 0) {
                 this.checkersArray[pos.x][pos.y] = this.checkersPool.get(this);
             } else {
-                this.checkersArray[pos.x][pos.y] = cc.instantiate(this.whiteChecker);
+                this.checkersArray[pos.x][pos.y] = cc.instantiate(this.checkerPrefab);
             }
             this.checkersArray[pos.x][pos.y].position = new cc.Vec2(
             	(pos.x - this.countCell/2)*this.widthCell+this.widthCell/2, 
