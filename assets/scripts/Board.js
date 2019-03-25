@@ -63,6 +63,14 @@ cc.Class({
         	default: null,
         	type: cc.SpriteFrame
     	},
+    	spriteWhiteChecker: {
+        	default: null,
+        	type: cc.SpriteFrame
+    	},
+    	spriteBlackChecker: {
+        	default: null,
+        	type: cc.SpriteFrame
+    	},
 		cell:{
 			default:null,
 			type:cc.Prefab
@@ -82,6 +90,7 @@ cc.Class({
   			this.checkersArray [i] = new Array(this.countCell);
 		};
 
+		this.checkersPool = new cc.NodePool('checkersPool');
     	this.currentPlayer = CurrentPlayerState.White;
     	this.selectedChecker = null;
     	this.currentCheckerStartMove = false;
@@ -109,8 +118,8 @@ cc.Class({
 					if(this.checkersArray[x][y].getComponent("Checker").checkersColor == CurrentPlayerState.Black )
 						whiteWin = false;
 				}
-		if(whiteWin) cc.log("White Win");
-		if(blackWin) cc.log("Black Win");
+		if(whiteWin) this.node.getComponent("View").showEndGame("White Win"); //cc.log("White Win");
+		if(blackWin) this.node.getComponent("View").showEndGame("Black Win"); //cc.log("Black Win");
     },
     showMove(){
     	this.possibleMoves = [];
@@ -214,14 +223,15 @@ cc.Class({
 
     	let cutedPos = this.victims[this.inArray(this.requiredMoves,endPos)].getComponent("Checker").pos;
     	this.checkersArray[cutedPos.x][cutedPos.y] = null;
-    	cc.log(this.victims[0]);
+
     	this.node.getComponent("View").cutChecker(
-    		endPos,this.checkersArray[endPos.x][endPos.y],this.victims[this.inArray(this.requiredMoves,endPos)]);
+    		endPos,this.checkersArray[endPos.x][endPos.y]);//,this.victims[this.inArray(this.requiredMoves,endPos)]);
+
+    	this.checkersPool.put(this.victims[this.inArray(this.requiredMoves,endPos)]);
 
     	if(this.showCutMove(this.selectedChecker)){
     		this.currentCheckerStartMove = true;
-    	}
-    	else{
+    	}else{
     		this.currentCheckerStartMove = false;
     		this.nextPlayer();
     	}
@@ -243,7 +253,6 @@ cc.Class({
    		if(this.selectedChecker)
    			this.showCutMove(this.selectedChecker);
 
-   		cc.log("requiredCut: " + requiredCut);
     	if ((this.checkersArray[pos.x][pos.y] != null) && !this.currentCheckerStartMove && 
     		(this.checkersArray[pos.x][pos.y].getComponent("Checker").checkersColor == this.currentPlayer)){
     		this.selectedChecker = this.checkersArray[pos.x][pos.y];
@@ -291,34 +300,58 @@ cc.Class({
 					createCell.call(this, this.spriteBlackWood,new cc.Vec2(i, j),cc.instantiate(this.cell));
     },
     addCheckers(){
-    	function createChecker(checker,pos,parent){
-    		this.checkersArray[pos.x][pos.y] = cc.instantiate(checker);
-    		// this.checkersArray[pos.x][pos.y].rotation = 180;
-    		this.checkersArray[pos.x][pos.y].position = new cc.Vec2((pos.x - this.countCell/2)*this.widthCell, (pos.y - this.countCell/2)*this.widthCell);
-    		this.checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
+    	function createChecker(checker,pos){
+    		this.checkersArray[pos.x][pos.y] = null;     
+            if (this.checkersPool.size() > 0) {
+                this.checkersArray[pos.x][pos.y] = this.checkersPool.get(this);
+            } else {
+                this.checkersArray[pos.x][pos.y] = cc.instantiate(this.whiteChecker);
+            }
+            this.checkersArray[pos.x][pos.y].position = 
+            	new cc.Vec2((pos.x - this.countCell/2)*this.widthCell, (pos.y - this.countCell/2)*this.widthCell);
+            this.checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = checker;
+            this.checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
     		this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = false;
-    		this.node.addChild(this.checkersArray[pos.x][pos.y]);
+    		return this.checkersArray[pos.x][pos.y];
+
+    		// this.checkersArray[pos.x][pos.y] = cc.instantiate(checker);
+    		// // this.checkersArray[pos.x][pos.y].rotation = 180;
+    		// this.checkersArray[pos.x][pos.y].position = new cc.Vec2((pos.x - this.countCell/2)*this.widthCell, (pos.y - this.countCell/2)*this.widthCell);
+    		// this.checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
+    		// this.checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = false;
+    		// this.node.addChild(this.checkersArray[pos.x][pos.y]);
     	}
 
     	let parent = new cc.Node();
     	parent.name = "Checkers";
+    	this.node.addChild(parent);
     	for (let x = 0; x < this.countCell; x++) 
 			for (let y = 0; y < this.countCell; y++){
 				this.checkersArray[x][y] = null;
     			if(y >= 0 && y < 3 && ((1+x+y)%2 == 0)){
-    				createChecker.call(this, this.blackChecker, new cc.Vec2(x, y), parent);
+    				parent.addChild(createChecker.call(this, this.spriteBlackChecker, new cc.Vec2(x, y)));
+    				// parent.addChild(createChecker.call(this, this.blackChecker, new cc.Vec2(x, y)));
     				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.Black;
     			}
     			if(y >= this.countCell-3 && y < this.countCell && ((1+x+y)%2 == 0)){
-    				createChecker.call(this, this.whiteChecker, new cc.Vec2(x, y), parent);
+    				parent.addChild(createChecker.call(this, this.spriteWhiteChecker, new cc.Vec2(x, y)));
+    				// parent.addChild(createChecker.call(this, this.whiteChecker, new cc.Vec2(x, y)));
     				this.checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.White;
     			}
     		}
+    	return parent;
     },
     start () {
     	this.widthCell = this.spriteBlackWood.getRect().width;
     	this.createBoard(this.countCell);
-    	this.addCheckers();
+    	this.parentCheckers = this.addCheckers();
     	this.node.getComponent("View").init(this.countCell,this.widthCell);
     },
+    newGame (){
+    	this.node.getComponent("View").showEndGame("");
+    	this.parentCheckers.destroy();
+    	this.onLoad();
+    	this.parentCheckers = this.addCheckers();
+    	this.node.getComponent("View").hideMove();
+    }
 });
