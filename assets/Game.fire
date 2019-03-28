@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.36406250000000234,
-      "y": 0.36406250000000234,
+      "x": 0.3640625,
+      "y": 0.3640625,
       "z": 1
     },
     "_quat": {
@@ -674,6 +674,54 @@
       "__id__": 5
     },
     "_enabled": true,
+    "spriteUp": {
+      "__uuid__": "261809be-c62b-4e7a-a6d6-943c32de64b6"
+    },
+    "spriteLeftUp": {
+      "__uuid__": "17bb2c49-56c0-4560-ae0b-b9ab776de598"
+    },
+    "spriteLeft": {
+      "__uuid__": "8615f898-22ee-4761-9af3-2190181c7035"
+    },
+    "spriteLeftDown": {
+      "__uuid__": "94d21eba-873e-4a11-92e5-a028908ff604"
+    },
+    "spriteDown": {
+      "__uuid__": "61def44f-1d4f-4171-aebd-dc66c4842647"
+    },
+    "spriteRightDown": {
+      "__uuid__": "b2a0d9cd-1c4d-4d95-8866-23050541c14d"
+    },
+    "spriteRight": {
+      "__uuid__": "53d0f735-738b-4155-9905-d12753147043"
+    },
+    "spriteRightUp": {
+      "__uuid__": "6ec7a740-90e2-4dc5-b3d4-1058c6fb27cb"
+    },
+    "spriteWhiteWood": {
+      "__uuid__": "ea89e7e9-5384-4466-9e59-5d7dc4a77d44"
+    },
+    "spriteBlackWood": {
+      "__uuid__": "3c49b804-3541-4c95-b233-71558f54218e"
+    },
+    "checkerPrefab": {
+      "__uuid__": "d15c7ec7-9522-4fb0-b9de-61ddd4f736fa"
+    },
+    "spriteWhiteQueen": {
+      "__uuid__": "bd684b40-1032-4411-ba1f-fe6ab4a8514b"
+    },
+    "spriteBlackQueen": {
+      "__uuid__": "88610bd8-dcfe-41b6-bcea-5a04a6d77d54"
+    },
+    "spriteWhiteChecker": {
+      "__uuid__": "b53c81e3-8009-47c2-a6dc-09b1b26c2c1c"
+    },
+    "spriteBlackChecker": {
+      "__uuid__": "2d928c89-4db1-426d-8b6a-2b03eef37c56"
+    },
+    "cell": {
+      "__uuid__": "04009bb0-556d-4dde-9c02-cf0e6c23691a"
+    },
     "gameOverNode": {
       "__id__": 14
     },
