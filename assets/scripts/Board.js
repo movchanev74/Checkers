@@ -7,18 +7,6 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-		spriteWhiteQueen: {
-        	default: null,
-        	type: cc.SpriteFrame
-    	},
-    	spriteBlackQueen: {
-        	default: null,
-        	type: cc.SpriteFrame
-    	},
-		isRotate: {
-            default: null,
-            type: cc.Node
-        },
 		countCell:8
     },
    	inArray(arr,item){//check element Vec2 in array
@@ -26,6 +14,9 @@ cc.Class({
    			if(arr[i].x == item.x && arr[i].y == item.y)
    				return i;
    		return -1;
+    },
+    setRotate(isRotate){
+    	this.isRotate = isRotate;
     },
     nextPlayer(){//change curent player on other
     	if(this.currentPlayer == CurrentPlayerState.White)
@@ -35,7 +26,7 @@ cc.Class({
     	this.selectedChecker = null;
     	this.currentCheckerStartMove = false;
     	this.checkEndGame();
-    	if(this.isRotate.getComponent(cc.Toggle).isChecked){
+    	if(this.isRotate){
     		this.node.rotation = 180 * this.currentPlayer;
     		for (let x = 0; x < this.countCell; x++) 
 				for (let y = 0; y < this.countCell; y++)

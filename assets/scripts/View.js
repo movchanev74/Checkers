@@ -77,7 +77,8 @@ cc.Class({
         checkerPrefab:{
             default:null,
             type:cc.Prefab
-        }
+        },
+        speedChecker:300
     },
     init(countCell){ //initialization
         this.countCell = countCell; 
@@ -126,17 +127,17 @@ cc.Class({
     },
     addCheckers(checkersArray){// create checkers and add their to array 
         function createChecker(checker,pos){
-            checkersArray[pos.x][pos.y] = null;     
+            let newCheckers = null;     
             if (this.checkersPool.size() > 0) {
-                checkersArray[pos.x][pos.y] = this.checkersPool.get(this);
+                newCheckers = this.checkersPool.get(this);
             } else {
-                checkersArray[pos.x][pos.y] = cc.instantiate(this.checkerPrefab);
+                newCheckers = cc.instantiate(this.checkerPrefab);
             }
-            checkersArray[pos.x][pos.y].position = this.arrayPosToScenePos(pos);
-            checkersArray[pos.x][pos.y].getComponent(cc.Sprite).spriteFrame = checker;
-            checkersArray[pos.x][pos.y].getComponent("Checker").pos = pos;
-            checkersArray[pos.x][pos.y].getComponent("Checker").isQueen = false;
-            return checkersArray[pos.x][pos.y];
+            newCheckers.position = this.arrayPosToScenePos(pos);
+            newCheckers.getComponent(cc.Sprite).spriteFrame = checker;
+            newCheckers.getComponent("Checker").pos = pos;
+            newCheckers.getComponent("Checker").isQueen = false;
+            return newCheckers;
         }
 
         let parent = new cc.Node();
@@ -146,11 +147,13 @@ cc.Class({
             for (let y = 0; y < this.countCell; y++){
                 checkersArray[x][y] = null;
                 if(y >= 0 && y < 3 && ((1+x+y)%2 == 0)){
-                     parent.addChild(createChecker.call(this, this.spriteWhiteChecker, new cc.Vec2(x, y)));
+                    checkersArray[x][y] = createChecker.call(this, this.spriteWhiteChecker, new cc.Vec2(x, y)) 
+                    parent.addChild(checkersArray[x][y]);
                     checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.White;
                 }
                 if(y >= this.countCell-3 && y < this.countCell && ((1+x+y)%2 == 0)){
-                    parent.addChild(createChecker.call(this, this.spriteBlackChecker, new cc.Vec2(x, y)));
+                    checkersArray[x][y] = createChecker.call(this, this.spriteBlackChecker, new cc.Vec2(x, y)) 
+                    parent.addChild(checkersArray[x][y]);
                     checkersArray[x][y].getComponent("Checker").checkersColor = window.CurrentPlayerState.Black;
                 }
             }
@@ -171,8 +174,7 @@ cc.Class({
     },
     moveChecker(endPos,checker){
         let pos = this.arrayPosToScenePos(endPos);
-        let speed = 300;
-        let time = new cc.Vec2(pos.x-checker.x,pos.y-checker.y).mag()/speed;
+        let time = new cc.Vec2(pos.x-checker.x,pos.y-checker.y).mag()/this.speedChecker;
         if(checker.getNumberOfRunningActions() == 0){
             this.actions = [];
             this.actions.push(cc.moveTo(time,pos.x,pos.y));
